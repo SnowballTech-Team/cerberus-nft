@@ -25,6 +25,7 @@ async function main() {
 
   // let dogeTx = await property.updateCdoge(1, 10000)
   // console.log('dogeTx:' + dogeTx.hash)
+
   // await dogeTx.wait()
 
   // let depositTx = await property.depositBerus(1, 10000)

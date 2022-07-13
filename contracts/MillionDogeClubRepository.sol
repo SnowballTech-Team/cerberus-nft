@@ -5,13 +5,15 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interface/IMillionDogeClub.sol";
-import "./lib/LevelUtil.sol";
+import "./interface/ILevel.sol";
 import "./owner/Manage.sol";
+import "./LevelEnum.sol";
 
 contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     IERC20 public cdegeToken;
     IERC20 public berusToken;
     IMillionDogeClub public mdc;
+    ILevel public levelInterface;
 
     uint256 public totalHashRate;
 
@@ -21,17 +23,19 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     struct Property {
         uint256 cdoge;
         uint256 berus;
-        LevelUtil.Level level;
+        Level level;
     }
 
     constructor(
         address _cdoge,
         address _berus,
-        address _mdc
+        address _mdc,
+        address _level
     ) {
         cdegeToken = IERC20(_cdoge);
         berusToken = IERC20(_berus);
         mdc = IMillionDogeClub(_mdc);
+        levelInterface = ILevel(_level);
     }
 
     /**
@@ -64,8 +68,8 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     {
         Property storage pro = property[_tokenId];
         pro.cdoge += _amount;
-        pro.level = LevelUtil.checkLevel(pro.cdoge, pro.berus);
-        totalHashRate += LevelUtil.checkBonus(pro.level);
+        pro.level = levelInterface.checkLevel(pro.cdoge, pro.berus);
+        totalHashRate += levelInterface.checkBonus(pro.level);
     }
 
     /**
@@ -75,7 +79,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         berusToken.transferFrom(msg.sender, address(this), _amount);
         Property storage pro = property[_tokenId];
         pro.berus += _amount;
-        pro.level = LevelUtil.checkLevel(pro.cdoge, pro.berus);
+        pro.level = levelInterface.checkLevel(pro.cdoge, pro.berus);
     }
 
     /**
