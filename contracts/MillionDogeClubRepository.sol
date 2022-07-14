@@ -4,13 +4,16 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./interface/IMillionDogeClub.sol";
 import "./interface/ILevel.sol";
 import "./owner/Manage.sol";
 import "./LevelEnum.sol";
 
 contract MillionDogeClubRepository is Manage, ReentrancyGuard {
-    IERC20 public cdegeToken;
+    using SafeMath for uint256;
+
+    IERC20 public cdogeToken;
     IERC20 public berusToken;
     IMillionDogeClub public mdc;
     ILevel public levelInterface;
@@ -20,11 +23,8 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     mapping(uint256 => Property) private property;
     mapping(address => uint256) public ownerHashRate;
 
-    struct Property {
-        uint256 cdoge;
-        uint256 berus;
-        Level level;
-    }
+    event SetProperty(address _manage, uint256 _tokenId);
+    event DepositBerus(address _owner, uint256 _tokenId, uint256 _amount);
 
     constructor(
         address _cdoge,
@@ -32,7 +32,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         address _mdc,
         address _level
     ) {
-        cdegeToken = IERC20(_cdoge);
+        cdogeToken = IERC20(_cdoge);
         berusToken = IERC20(_berus);
         mdc = IMillionDogeClub(_mdc);
         levelInterface = ILevel(_level);
@@ -45,6 +45,8 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         external
         onlyManage
     {
+        emit SetProperty(msg.sender, _tokenId);
+
         property[_tokenId] = _property;
     }
 
@@ -80,6 +82,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         Property storage pro = property[_tokenId];
         pro.berus += _amount;
         pro.level = levelInterface.checkLevel(pro.cdoge, pro.berus);
+        emit DepositBerus(msg.sender, _tokenId, _amount);
     }
 
     /**
@@ -87,8 +90,15 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
      */
     function burn(uint256 _tokenId) external {
         Property memory pro = property[_tokenId];
-        cdegeToken.transferFrom(address(this), msg.sender, pro.cdoge);
+        cdogeToken.transferFrom(address(this), msg.sender, pro.cdoge);
+        berusToken.transferFrom(address(this), msg.sender, pro.berus);
         mdc.burn(_tokenId);
         delete property[_tokenId];
+    }
+
+    function updateHashRate(uint256 _cdoge, Level _lv) internal {
+        totalHashRate = _cdoge.add(
+            _cdoge.mul(levelInterface.checkBonus(_lv).div(1000))
+        );
     }
 }

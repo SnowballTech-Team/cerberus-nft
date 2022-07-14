@@ -12,3 +12,9 @@ enum Level {
     Martian,
     Collector
 }
+
+struct Property {
+    uint256 cdoge;
+    uint256 berus;
+    Level level;
+}
