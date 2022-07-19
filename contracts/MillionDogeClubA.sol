@@ -2,15 +2,22 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./owner/Manage.sol";
 import "./ERC721A.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract MillionDogeClub is Ownable, ERC721A, ReentrancyGuard {
+contract MillionDogeClub is Ownable, ERC721A, ReentrancyGuard, Manage {
+    string public baseURI;
+
+    event SetBaseURI(string indexed baseURI, address _owner);
+
     constructor() ERC721A("MillionDogeClub", "MDC") {}
 
-    function mint(address recipient, uint256 quantity) external payable {
+    function mint(address recipient, uint256 quantity)
+        external
+        payable
+        onlyManage
+    {
         // `_mint`'s second argument now takes in a `quantity`, not a `tokenId`.
         _mint(recipient, quantity);
     }
@@ -21,7 +28,12 @@ contract MillionDogeClub is Ownable, ERC721A, ReentrancyGuard {
      * by default, it can be overridden in child contracts.
      */
     function _baseURI() internal view virtual override returns (string memory) {
-        return "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/";
+        return baseURI;
+    }
+
+    function setBaseURI(string memory baseURI_) public virtual onlyOwner {
+        baseURI = baseURI_;
+        emit SetBaseURI(baseURI_, msg.sender);
     }
 
     // burn nft without approval

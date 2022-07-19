@@ -2,13 +2,18 @@
 
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract MillionDogeClub is Ownable, ERC721Pausable, ReentrancyGuard {
+contract MillionDogeClub is
+    Ownable,
+    ERC721Enumerable,
+    ReentrancyGuard,
+    Pausable
+{
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIds;
@@ -41,6 +46,23 @@ contract MillionDogeClub is Ownable, ERC721Pausable, ReentrancyGuard {
             "ERC721Burnable: caller is not owner nor approved"
         );
         _burn(tokenId);
+    }
+
+    /**
+     * @dev See {ERC721-_beforeTokenTransfer}.
+     *
+     * Requirements:
+     *
+     * - the contract must not be paused.
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override {
+        super._beforeTokenTransfer(from, to, tokenId);
+
+        require(!paused(), "ERC721Pausable: token transfer while paused");
     }
 
     function pause() external onlyOwner {
