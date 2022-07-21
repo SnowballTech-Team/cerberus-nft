@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./owner/Manage.sol";
+import "../owner/Manage.sol";
 import "./ERC721A.sol";
 
 contract MillionDogeClub is Ownable, ERC721A, ReentrancyGuard, Manage {
