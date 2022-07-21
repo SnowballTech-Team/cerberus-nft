@@ -9,15 +9,14 @@ import "./interface/IRepository.sol";
 import "./interface/ILevel.sol";
 
 contract MiningPool is Ownable, ReentrancyGuard {
+    uint256 public totalHash;
     using SafeMath for uint256;
 
     ILevel public level;
     IERC20 public cdoge;
     IRepository property;
 
-    uint256 public rewardRate = 0;
-
-    mapping(uint256 => uint256) public rewards;
+    mapping(uint256 => uint256) public perTokenReward;
 
     constructor(
         address _pro,
@@ -27,26 +26,21 @@ contract MiningPool is Ownable, ReentrancyGuard {
         property = IRepository(_pro);
         cdoge = IERC20(_cdoge);
         level = ILevel(_level);
-        rewardRate = 1e15;
     }
 
+    //
     function earned(uint256 _tokenId) public view returns (uint256) {
-        return rewardRate.mul(property.tokenHashRate(_tokenId));
+        Property memory pro = property.getProperty(_tokenId);
+        // get token level
+        uint256 lv = level.checkBonus(pro.level);
+        // calc current rate
+        uint256 _rate = pro.cdoge.mul(lv).div(1000).add(pro.cdoge);
+
+        return cdoge.balanceOf(address(this)).div(totalHash).mul(_rate);
     }
 
     function getReward(uint256 _tokenId) external nonReentrant {
-        uint256 reward_ = earned(_tokenId);
-        require(reward_ > 0, "");
-        cdoge.transferFrom(address(this), msg.sender, reward_);
-        emit GetReward(msg.sender, _tokenId, reward_);
+        perTokenReward[_tokenId] = cdoge.balanceOf(address(this));
+        cdoge.transferFrom(address(this), msg.sender, earned(_tokenId));
     }
-
-    function setRewardRate(uint256 _rate) external onlyOwner {
-        require(_rate > 0, "rate is zero");
-        rewardRate = _rate;
-        emit SetRewardRate(msg.sender);
-    }
-
-    event SetRewardRate(address _owner);
-    event GetReward(address _owner, uint256 _tokenId, uint256 _reward);
 }

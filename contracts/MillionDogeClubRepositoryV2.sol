@@ -18,6 +18,8 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     IMillionDogeClub public mdc;
     ILevel public levelInterface;
 
+    uint256 public totalHashRate;
+
     mapping(uint256 => Property) private property;
 
     event SetProperty(address _manage, uint256 _tokenId);
@@ -68,6 +70,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         Property storage pro = property[_tokenId];
         pro.cdoge += _amount;
         pro.level = levelInterface.checkLevel(pro.cdoge, pro.berus);
+        totalHashRate += _amount;
     }
 
     /**
@@ -89,6 +92,15 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         cdogeToken.transferFrom(address(this), msg.sender, pro.cdoge);
         berusToken.transferFrom(address(this), msg.sender, pro.berus);
         mdc.burn(_tokenId);
+        totalHashRate -= pro.cdoge;
         delete property[_tokenId];
+    }
+
+    function tokenHashRate(uint256 _tokenId) external view returns (uint256) {
+        Property memory pro = property[_tokenId];
+        // get token level
+        uint256 lv = levelInterface.checkBonus(pro.level);
+        // calc current rate
+        return pro.cdoge.mul(lv).div(1000).add(pro.cdoge);
     }
 }

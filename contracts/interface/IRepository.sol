@@ -10,4 +10,6 @@ interface IRepository {
         returns (Property memory);
 
     function updateCdoge(uint256 _tokenId, uint256 _amount) external;
+
+    function tokenHashRate(uint256 _tokenId) external view returns (uint256);
 }
