@@ -18,6 +18,7 @@ contract MiningPool is Ownable, ReentrancyGuard {
     uint256 public rewardRate = 0;
 
     mapping(uint256 => uint256) public rewards;
+    mapping(uint256 => uint256) public token;
 
     constructor(
         address _pro,
