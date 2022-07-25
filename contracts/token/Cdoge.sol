@@ -29,7 +29,7 @@ contract Cdoge is ERC20, Ownable {
         return true;
     }
 
-    function burn(uint256 amount) external onlyOwner returns (bool) {
+    function burn(uint256 amount) external returns (bool) {
         emit Burn(amount, _msgSender());
         super._burn(_msgSender(), amount);
         return true;

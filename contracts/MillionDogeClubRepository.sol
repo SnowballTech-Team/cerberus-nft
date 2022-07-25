@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./interface/IMillionDogeClub.sol";
 import "./interface/ILevel.sol";
+import "./interface/IBerus.sol";
 import "./owner/Manage.sol";
 import "./LevelEnum.sol";
 
@@ -14,7 +15,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     using SafeMath for uint256;
 
     IERC20 public cdogeToken;
-    IERC20 public berusToken;
+    IBerus public berusToken;
     IMillionDogeClub public mdc;
     ILevel public levelInterface;
 
@@ -30,7 +31,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         address _level
     ) {
         cdogeToken = IERC20(_cdoge);
-        berusToken = IERC20(_berus);
+        berusToken = IBerus(_berus);
         mdc = IMillionDogeClub(_mdc);
         levelInterface = ILevel(_level);
     }
@@ -89,6 +90,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         cdogeToken.transferFrom(address(this), msg.sender, pro.cdoge);
         berusToken.transferFrom(address(this), msg.sender, pro.berus);
         mdc.burn(_tokenId);
+        berusToken.burn(pro.berus);
         delete property[_tokenId];
     }
 }
