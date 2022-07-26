@@ -19,14 +19,14 @@ contract CBerus is ERC20, IERC2917 {
     uint256 public mintCumulation;
     uint256 private unlocked = 1;
     uint256 public cberusPerBlock;
-    uint256 lastRewardBlock;
-    uint256 totalProductivity;
-    uint256 accAmountPerShare;
+    uint256 private lastRewardBlock;
+    uint256 public totalHashRate;
+    uint256 public rewardPerHashRateStored;
 
     mapping(address => UserInfo) public users;
 
     struct UserInfo {
-        uint256 amount; // How many hashRate the user has provided.
+        uint256 hashRate; // How many hashRate the user has provided.
         uint256 rewardDebt; // Reward debt.
     }
 
@@ -57,7 +57,7 @@ contract CBerus is ERC20, IERC2917 {
     // This function increase user's productivity and updates the global productivity.
     // the users' actual share percentage will calculated by:
     // Formula:     user_productivity / global_productivity
-    function increaseProductivity(address user, uint256 value)
+    function increaseHashRate(address user, uint256 value)
         external
         override
         update
@@ -66,20 +66,22 @@ contract CBerus is ERC20, IERC2917 {
         require(value > 0, "PRODUCTIVITY_VALUE_MUST_BE_GREATER_THAN_ZERO");
 
         UserInfo storage userInfo = users[user];
-        if (userInfo.amount > 0) {
+        if (userInfo.hashRate > 0) {
             uint256 pending = userInfo
-                .amount
-                .mul(accAmountPerShare)
+                .hashRate
+                .mul(rewardPerHashRateStored)
                 .div(1e12)
                 .sub(userInfo.rewardDebt);
             _transfer(address(this), user, pending);
             mintCumulation = mintCumulation.add(pending);
         }
+        totalHashRate = totalHashRate.add(value);
 
-        totalProductivity = totalProductivity.add(value);
-
-        userInfo.amount = userInfo.amount.add(value);
-        userInfo.rewardDebt = userInfo.amount.mul(accAmountPerShare).div(1e12);
+        userInfo.hashRate = userInfo.hashRate.add(value);
+        userInfo.rewardDebt = userInfo
+            .hashRate
+            .mul(rewardPerHashRateStored)
+            .div(1e12);
         emit ProductivityIncreased(user, value);
         return true;
     }
@@ -87,7 +89,7 @@ contract CBerus is ERC20, IERC2917 {
     // External function call
     // This function will decreases user's productivity by value, and updates the global productivity
     // it will record which block this is happenning and accumulates the area of (productivity * time)
-    function decreaseProductivity(address user, uint256 value)
+    function decreaseHashRate(address user, uint256 value)
         external
         override
         update
@@ -96,15 +98,20 @@ contract CBerus is ERC20, IERC2917 {
         require(value > 0, "INSUFFICIENT_PRODUCTIVITY");
 
         UserInfo storage userInfo = users[user];
-        require(userInfo.amount >= value, "WASABI: FORBIDDEN");
-        uint256 pending = userInfo.amount.mul(accAmountPerShare).div(1e12).sub(
-            userInfo.rewardDebt
-        );
+        require(userInfo.hashRate >= value, "CBERUS: FORBIDDEN");
+        uint256 pending = userInfo
+            .hashRate
+            .mul(rewardPerHashRateStored)
+            .div(1e12)
+            .sub(userInfo.rewardDebt);
         _transfer(address(this), user, pending);
         mintCumulation = mintCumulation.add(pending);
-        userInfo.amount = userInfo.amount.sub(value);
-        userInfo.rewardDebt = userInfo.amount.mul(accAmountPerShare).div(1e12);
-        totalProductivity = totalProductivity.sub(value);
+        userInfo.hashRate = userInfo.hashRate.sub(value);
+        userInfo.rewardDebt = userInfo
+            .hashRate
+            .mul(rewardPerHashRateStored)
+            .div(1e12);
+        totalHashRate = totalHashRate.sub(value);
 
         emit ProductivityDecreased(user, value);
         return true;
@@ -112,34 +119,34 @@ contract CBerus is ERC20, IERC2917 {
 
     function take() external view override returns (uint256) {
         UserInfo storage userInfo = users[msg.sender];
-        uint256 _accAmountPerShare = accAmountPerShare;
+        uint256 _rewardPerHashRateStored = rewardPerHashRateStored;
         // uint256 lpSupply = totalProductivity;
-        if (block.number > lastRewardBlock && totalProductivity != 0) {
+        if (block.number > lastRewardBlock && totalHashRate != 0) {
             uint256 multiplier = block.number.sub(lastRewardBlock);
             uint256 reward = multiplier.mul(cberusPerBlock);
-            _accAmountPerShare = _accAmountPerShare.add(
-                reward.mul(1e12).div(totalProductivity)
+            _rewardPerHashRateStored = _rewardPerHashRateStored.add(
+                reward.mul(1e12).div(totalHashRate)
             );
         }
         return
-            userInfo.amount.mul(_accAmountPerShare).div(1e12).sub(
+            userInfo.hashRate.mul(_rewardPerHashRateStored).div(1e12).sub(
                 userInfo.rewardDebt
             );
     }
 
     function takeWithAddress(address user) external view returns (uint256) {
         UserInfo storage userInfo = users[user];
-        uint256 _accAmountPerShare = accAmountPerShare;
+        uint256 __rewardPerHashRateStored = rewardPerHashRateStored;
         // uint256 lpSupply = totalProductivity;
-        if (block.number > lastRewardBlock && totalProductivity != 0) {
+        if (block.number > lastRewardBlock && totalHashRate != 0) {
             uint256 multiplier = block.number.sub(lastRewardBlock);
             uint256 reward = multiplier.mul(cberusPerBlock);
-            _accAmountPerShare = _accAmountPerShare.add(
-                reward.mul(1e12).div(totalProductivity)
+            __rewardPerHashRateStored = __rewardPerHashRateStored.add(
+                reward.mul(1e12).div(totalHashRate)
             );
         }
         return
-            userInfo.amount.mul(_accAmountPerShare).div(1e12).sub(
+            userInfo.hashRate.mul(__rewardPerHashRateStored).div(1e12).sub(
                 userInfo.rewardDebt
             );
     }
@@ -147,17 +154,17 @@ contract CBerus is ERC20, IERC2917 {
     // Returns how much a user could earn plus the giving block number.
     function takeWithBlock() external view override returns (uint256, uint256) {
         UserInfo storage userInfo = users[msg.sender];
-        uint256 _accAmountPerShare = accAmountPerShare;
+        uint256 _rewardPerHashRateStored = rewardPerHashRateStored;
         // uint256 lpSupply = totalProductivity;
-        if (block.number > lastRewardBlock && totalProductivity != 0) {
+        if (block.number > lastRewardBlock && totalHashRate != 0) {
             uint256 multiplier = block.number.sub(lastRewardBlock);
             uint256 reward = multiplier.mul(cberusPerBlock);
-            _accAmountPerShare = _accAmountPerShare.add(
-                reward.mul(1e12).div(totalProductivity)
+            _rewardPerHashRateStored = _rewardPerHashRateStored.add(
+                reward.mul(1e12).div(totalHashRate)
             );
         }
         return (
-            userInfo.amount.mul(_accAmountPerShare).div(1e12).sub(
+            userInfo.hashRate.mul(_rewardPerHashRateStored).div(1e12).sub(
                 userInfo.rewardDebt
             ),
             block.number
@@ -172,18 +179,18 @@ contract CBerus is ERC20, IERC2917 {
     }
 
     // Returns how many productivity a user has and global has.
-    function getProductivity(address user)
+    function getTotalHashRate(address user)
         external
         view
         override
         returns (uint256, uint256)
     {
-        return (users[user].amount, totalProductivity);
+        return (users[user].hashRate, totalHashRate);
     }
 
     // Returns the current gorss product rate.
     function interestsPerBlock() external view override returns (uint256) {
-        return accAmountPerShare;
+        return rewardPerHashRateStored;
     }
 
     modifier lock() {
@@ -199,15 +206,15 @@ contract CBerus is ERC20, IERC2917 {
             return;
         }
 
-        if (totalProductivity == 0) {
+        if (totalHashRate == 0) {
             lastRewardBlock = block.number;
             return;
         }
         uint256 multiplier = block.number.sub(lastRewardBlock);
         uint256 reward = multiplier.mul(cberusPerBlock);
         super._mint(address(this), reward);
-        accAmountPerShare = accAmountPerShare.add(
-            reward.mul(1e12).div(totalProductivity)
+        rewardPerHashRateStored = rewardPerHashRateStored.add(
+            reward.div(totalHashRate)
         );
         lastRewardBlock = block.number;
         _;

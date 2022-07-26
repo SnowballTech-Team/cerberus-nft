@@ -93,4 +93,12 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         berusToken.burn(pro.berus);
         delete property[_tokenId];
     }
+
+    function tokenHashRate(uint256 _tokenId) external view returns (uint256) {
+        Property memory pro = property[_tokenId];
+        // get token level
+        uint256 lv = levelInterface.checkBonus(pro.level);
+        // calc current rate
+        return pro.cdoge.mul(lv).div(1000).add(pro.cdoge);
+    }
 }

@@ -27,7 +27,7 @@ interface IERC2917 is IERC20 {
     /// @notice It will get the productivity of given user.
     /// @dev it will return 0 if user has no productivity proved in the contract.
     /// @return user's productivity and overall productivity.
-    function getProductivity(address user)
+    function getTotalHashRate(address user)
         external
         view
         returns (uint256, uint256);
@@ -35,14 +35,14 @@ interface IERC2917 is IERC20 {
     /// @notice increase a user's productivity.
     /// @dev Note the best practice will be restrict the callee to prove of productivity's contract address.
     /// @return true to confirm that the productivity added success.
-    function increaseProductivity(address user, uint256 value)
+    function increaseHashRate(address user, uint256 value)
         external
         returns (bool);
 
     /// @notice decrease a user's productivity.
     /// @dev Note the best practice will be restrict the callee to prove of productivity's contract address.
     /// @return true to confirm that the productivity removed success.
-    function decreaseProductivity(address user, uint256 value)
+    function decreaseHashRate(address user, uint256 value)
         external
         returns (bool);
 
