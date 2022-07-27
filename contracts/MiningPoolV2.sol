@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./interface/IRepository.sol";
 import "./interface/ILevel.sol";
 
-contract MiningPool is Ownable, ReentrancyGuard {
+contract MiningPoolV2 is Ownable, ReentrancyGuard {
     uint256 public totalHash;
     using SafeMath for uint256;
 

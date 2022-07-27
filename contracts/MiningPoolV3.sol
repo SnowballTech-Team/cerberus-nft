@@ -9,7 +9,7 @@ import "./interface/IRepository.sol";
 import "./interface/ILevel.sol";
 import "./interface/IERC2917.sol";
 
-contract MiningPool is Ownable, ReentrancyGuard {
+contract MiningPoolV3 is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
 
     ILevel public level;
@@ -19,6 +19,7 @@ contract MiningPool is Ownable, ReentrancyGuard {
 
     mapping(uint256 => uint256) public hashRateOfToken;
     mapping(address => uint256) public hashRateOfAddress;
+    mapping(uint256 => address) public tokenOwnerOf;
 
     constructor(
         address _pro,
@@ -35,20 +36,31 @@ contract MiningPool is Ownable, ReentrancyGuard {
     function stake(uint256 _tokenId) external {
         uint256 _rate = property.tokenHashRate(_tokenId);
         require(_rate > 0, "rate is zero");
+        // current holder
         address owner = mdc.ownerOf(_tokenId);
         require(owner == msg.sender, "not owner");
-        hashRateOfAddress[msg.sender] = hashRateOfAddress[msg.sender].add(
-            _rate
-        );
-        hashRateOfToken[_tokenId] = hashRateOfToken[_tokenId].add(_rate);
-        cberus.increaseProductivity(msg.sender, _rate);
+
+        hashRateOfToken[_tokenId] = _rate;
+        //
+        address holder = tokenOwnerOf[_tokenId];
+        if (holder == address(0) || holder == owner) {
+            cberus.increaseHashRate(msg.sender, _rate);
+            hashRateOfAddress[owner] = hashRateOfAddress[owner].add(_rate);
+        } else {
+            cberus.decreaseHashRate(holder, _rate);
+            hashRateOfAddress[holder] = hashRateOfAddress[holder].sub(_rate);
+        }
+
         emit Stake(msg.sender, _tokenId);
     }
 
     function unStake(uint256 _tokenId) external {
+        address owner = mdc.ownerOf(_tokenId);
+        require(owner == msg.sender, "not owner");
+
         uint256 _rate = property.tokenHashRate(_tokenId);
         require(_rate > 0, "rate is zero");
-        cberus.decreaseProductivity(msg.sender, _rate);
+        cberus.decreaseHashRate(msg.sender, _rate);
         hashRateOfToken[_tokenId] = hashRateOfToken[_tokenId].sub(_rate);
         emit UnStake(msg.sender, _tokenId);
     }
