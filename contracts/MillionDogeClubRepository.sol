@@ -19,6 +19,8 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     IMillionDogeClub public mdc;
     ILevel public levelInterface;
 
+    uint256 public baseDoge;
+    uint256 public baseBerus;
     mapping(uint256 => Property) private property;
 
     event SetProperty(address _manage, uint256 _tokenId);
@@ -36,16 +38,17 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         levelInterface = ILevel(_level);
     }
 
+    function baseRepos() private view returns (Property memory) {
+        Property memory pro = Property(baseDoge, baseBerus, Level.Soldier);
+        return pro;
+    }
+
     /**
      * set nft property
      */
-    function setProperty(uint256 _tokenId, Property calldata _property)
-        external
-        onlyManage
-    {
+    function setProperty(uint256 _tokenId) external onlyManage {
         emit SetProperty(msg.sender, _tokenId);
-
-        property[_tokenId] = _property;
+        property[_tokenId] = baseRepos();
     }
 
     /**
@@ -100,5 +103,13 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         uint256 lv = levelInterface.checkBonus(pro.level);
         // calc current rate
         return pro.cdoge.mul(lv).div(1000).add(pro.cdoge);
+    }
+
+    function setBaseDoge(uint256 _base) external onlyOwner {
+        baseDoge = _base;
+    }
+
+    function setBaseBerus(uint256 _base) external onlyOwner {
+        baseBerus = _base;
     }
 }

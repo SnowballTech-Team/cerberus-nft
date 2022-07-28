@@ -16,7 +16,8 @@ async function main() {
   const mdc = await MDC.deploy()
   await mdc.deployed()
 
-  // MDC deployed to: 0xc9F83DD071241C83FF1A6ee9c39eb4D00640B151
+  // MDC deployed to: 0x153d3F1FCE5BfB50752fd3F6D44EA20522952e2a
+  // MDC deployed to: 0x4352D7BbBe6e439951308727701Dcc564Cf75aCB
   console.log('MDC deployed to:', mdc.address)
 }
 

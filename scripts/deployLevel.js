@@ -12,10 +12,11 @@ async function main() {
   const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS
   const lockedAmount = hre.ethers.utils.parseEther('1')
 
-  const Level = await hre.ethers.getContractFactory('Level')
+  const Level = await hre.ethers.getContractFactory('LevelUtil')
   const level = await Level.deploy()
   await level.deployed()
 
+  // level deployed to: 0x3C93b51c4D82AAB48DF7C45EF4Ff76471f05D6E4
   console.log('level deployed to:', level.address)
 }
 

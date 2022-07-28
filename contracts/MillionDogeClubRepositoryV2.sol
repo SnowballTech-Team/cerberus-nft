@@ -10,7 +10,7 @@ import "./interface/ILevel.sol";
 import "./owner/Manage.sol";
 import "./LevelEnum.sol";
 
-contract MillionDogeClubRepository is Manage, ReentrancyGuard {
+contract MillionDogeClubRepositoryV2 is Manage, ReentrancyGuard {
     using SafeMath for uint256;
 
     IERC20 public cdogeToken;

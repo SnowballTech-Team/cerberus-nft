@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../owner/Manage.sol";
 import "./ERC721A.sol";
 
-contract MillionDogeClub is Ownable, ERC721A, ReentrancyGuard, Manage {
+contract MillionDogeClubA is Ownable, ERC721A, ReentrancyGuard, Manage {
     string public baseURI;
 
     event SetBaseURI(string indexed baseURI, address _owner);

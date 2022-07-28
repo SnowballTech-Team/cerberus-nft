@@ -41,8 +41,7 @@ contract Cdoge is ERC20, Ownable {
         returns (bool)
     {
         if (recipient == pair) {
-            uint256 fee = amount -
-                (calculateFee(_msgSender(), recipient, amount));
+            uint256 fee = calculateFee(_msgSender(), recipient, amount);
             if (fee > 0) {
                 super._transfer(_msgSender(), address(pool), fee);
                 super._transfer(_msgSender(), recipient, amount - fee);
@@ -59,7 +58,7 @@ contract Cdoge is ERC20, Ownable {
         uint256 amount
     ) public override returns (bool) {
         if (to == pair) {
-            uint256 fee = amount - (calculateFee(from, to, amount));
+            uint256 fee = calculateFee(from, to, amount);
             if (fee > 0) {
                 super._transfer(from, address(pool), fee);
                 super._transfer(from, to, amount - fee);
