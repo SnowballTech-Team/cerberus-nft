@@ -41,7 +41,7 @@ module.exports = {
     // },
     rinkeby: {
       url: 'https://rinkeby.infura.io/v3/ba02f03eee044631ac5c82c559c727b9',
-      accounts: ['ed12ffba139cc19d31829cbae641c294c22f88019c0e6116681a9c218ad66031'],
+      accounts: [''],
     },
     // gasReporter: {
     //   enabled: process.env.REPORT_GAS !== undefined,
