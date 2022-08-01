@@ -27,7 +27,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     uint256 public baseDoge;
     uint256 public baseBerus;
     mapping(uint256 => Property) private property;
-    mapping(uint256 => EnumerableSet.AddressSet) private sellRecored;
+    mapping(uint256 => History[]) private sellRecored;
     mapping(uint256 => EnumerableSet.UintSet) private _ownedTokens;
 
     event SetDogeToken(address manage, address _token);
@@ -88,7 +88,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         Property storage pro = property[_tokenId];
         pro.cdoge += _amount;
         pro.level = levelInterface.checkLevel(pro.cdoge, pro.berus);
-        sellRecored[_tokenId].add(seller);
+        sellRecored[_tokenId].push(History(seller, pro.level));
         emit UpdateCdoge(seller, _tokenId, _amount);
     }
 
@@ -123,16 +123,12 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         return pro.cdoge.mul(lv).div(baseDivider).add(pro.cdoge);
     }
 
-    function sellRecoredByIndex(uint256 tokenId, uint256 index)
+    function sellRecoredOfTokenId(uint256 tokenId)
         external
         view
-        returns (address)
+        returns (History[] memory)
     {
-        return sellRecored[tokenId].at(index);
-    }
-
-    function numberOfTransfer(uint256 tokenId) external view returns (uint256) {
-        return sellRecored[tokenId].length();
+        return sellRecored[tokenId];
     }
 
     function setBaseDoge(uint256 _base) external onlyManage {
