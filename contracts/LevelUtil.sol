@@ -23,6 +23,25 @@ contract LevelUtil is Manage {
     uint256[2] public levelMartian;
     uint256[2] public levelCollector;
 
+    constructor() {
+        soldierBonus = 10;
+        generalBonus = 20;
+        chieftainBonus = 30;
+        kingBonus = 69;
+        astronautBonus = 80;
+        alienBonus = 90;
+        martianBonus = 100;
+        collectorBonus = 169;
+        levelSoldier = [1000, 10000];
+        levelGeneral = [2000, 20000];
+        levelChieftain = [10000, 100000];
+        levelKing = [50000, 500000];
+        levelAstronaut = [100000, 1000000];
+        levelAlien = [200000, 2000000];
+        levelMartian = [1000000, 10000000];
+        levelCollector = [1000000, 10000000];
+    }
+
     function setSoldierBonus(uint256 _bonus) external onlyManage {
         require(_bonus > 0, "bonus is zero");
         soldierBonus = _bonus;

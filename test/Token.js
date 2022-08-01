@@ -23,6 +23,11 @@ async function main() {
   // let totalSupply = await token.totalSupply()
   // console.log('totalSupply:' + totalSupply)
 
+  // setPair
+  let pairTx = await token.setPair('0x6671117d1f14849D5a85Ec9c243797af8F62Dd12')
+  console.log('pairTx:' + pairTx.hash)
+  await pairTx.wait()
+
   // approve
   // let approveTx = await token.approve('0x6671117d1f14849D5a85Ec9c243797af8F62Dd12', amount)
   // console.log('approveTx:' + approveTx.hash)

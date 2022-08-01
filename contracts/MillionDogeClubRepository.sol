@@ -2,6 +2,7 @@
 
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -12,6 +13,8 @@ import "./owner/Manage.sol";
 import "./LevelEnum.sol";
 
 contract MillionDogeClubRepository is Manage, ReentrancyGuard {
+    using EnumerableSet for EnumerableSet.UintSet;
+    using EnumerableSet for EnumerableSet.AddressSet;
     using SafeMath for uint256;
 
     IERC20 public cdogeToken;
@@ -19,12 +22,24 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     IMillionDogeClub public mdc;
     ILevel public levelInterface;
 
+    uint256 public baseDivider = 1000;
+
     uint256 public baseDoge;
     uint256 public baseBerus;
     mapping(uint256 => Property) private property;
+    mapping(uint256 => EnumerableSet.AddressSet) private sellRecored;
+    mapping(uint256 => EnumerableSet.UintSet) private _ownedTokens;
 
+    event SetDogeToken(address manage, address _token);
+    event SetBerusToken(address manage, address _token);
+    event SetMdc(address manage, address _mdc);
+    event SetLevel(address manage, address _level);
+    event SetBaseDivider(address manage, uint256 _base);
+    event SetBaseDoge(address manage, uint256 _base);
+    event SetBaseBerus(address manage, uint256 _base);
     event SetProperty(address _manage, uint256 _tokenId);
     event DepositBerus(address _owner, uint256 _tokenId, uint256 _amount);
+    event UpdateCdoge(address seller, uint256 _tokenId, uint256 _amount);
 
     constructor(
         address _cdoge,
@@ -65,13 +80,16 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     /**
      * update cdoge
      */
-    function updateCdoge(uint256 _tokenId, uint256 _amount)
-        external
-        onlyManage
-    {
+    function updateCdoge(
+        address seller,
+        uint256 _tokenId,
+        uint256 _amount
+    ) external onlyManage {
         Property storage pro = property[_tokenId];
         pro.cdoge += _amount;
         pro.level = levelInterface.checkLevel(pro.cdoge, pro.berus);
+        sellRecored[_tokenId].add(seller);
+        emit UpdateCdoge(seller, _tokenId, _amount);
     }
 
     /**
@@ -102,14 +120,60 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         // get token level
         uint256 lv = levelInterface.checkBonus(pro.level);
         // calc current rate
-        return pro.cdoge.mul(lv).div(1000).add(pro.cdoge);
+        return pro.cdoge.mul(lv).div(baseDivider).add(pro.cdoge);
     }
 
-    function setBaseDoge(uint256 _base) external onlyOwner {
+    function sellRecoredByIndex(uint256 tokenId, uint256 index)
+        external
+        view
+        returns (address)
+    {
+        return sellRecored[tokenId].at(index);
+    }
+
+    function numberOfTransfer(uint256 tokenId) external view returns (uint256) {
+        return sellRecored[tokenId].length();
+    }
+
+    function setBaseDoge(uint256 _base) external onlyManage {
+        require(_base >= 0, "base is zero");
         baseDoge = _base;
+        emit SetBaseDoge(msg.sender, _base);
     }
 
-    function setBaseBerus(uint256 _base) external onlyOwner {
+    function setBaseBerus(uint256 _base) external onlyManage {
+        require(_base >= 0, "base is zero");
         baseBerus = _base;
+        emit SetBaseBerus(msg.sender, _base);
+    }
+
+    function setDogeToken(address _token) external onlyManage {
+        require(_token != address(0), "token address is zero");
+        cdogeToken = IERC20(_token);
+        emit SetDogeToken(msg.sender, _token);
+    }
+
+    function setBerusToken(address _token) external onlyManage {
+        require(_token != address(0), "token address is zero");
+        berusToken = IBerus(_token);
+        emit SetBerusToken(msg.sender, _token);
+    }
+
+    function setMdc(address _token) external onlyManage {
+        require(_token != address(0), "token address is zero");
+        mdc = IMillionDogeClub(_token);
+        emit SetMdc(msg.sender, _token);
+    }
+
+    function setLevel(address _level) external onlyManage {
+        require(_level != address(0), "level address is zero");
+        levelInterface = ILevel(_level);
+        emit SetLevel(msg.sender, _level);
+    }
+
+    function setBaseDivider(uint256 _base) external onlyManage {
+        require(_base > 0, "_base divider is zero");
+        baseDivider = _base;
+        emit SetBaseDivider(msg.sender, _base);
     }
 }

@@ -2,6 +2,10 @@
 
 pragma solidity ^0.8.6;
 
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -16,8 +20,11 @@ import "./interface/ILevel.sol";
        _____________________________________________________________________________  * (gross_product(t1) - gross_product(t0))
        total_accumulated_productivity(time1) - total_accumulated_productivity(time0)
 */
-contract CBerus is ERC20 {
+contract CBerus is ERC20, ReentrancyGuard, ERC721Holder {
+    using EnumerableMap for EnumerableMap.UintToAddressMap;
+    using EnumerableSet for EnumerableSet.UintSet;
     using SafeMath for uint256;
+    EnumerableMap.UintToAddressMap private tokenOwner;
 
     ILevel public level;
     IRepository property;
@@ -30,12 +37,12 @@ contract CBerus is ERC20 {
     uint256 public totalHashRate;
     uint256 public rewardPerHashRateStored;
 
-    mapping(uint256 => TokenInfo) public tokenInfo;
+    mapping(address => TokenInfo) public tokenInfo;
+    mapping(address => EnumerableSet.UintSet) private _ownedTokens;
 
     struct TokenInfo {
         uint256 hashRate; // How many hashRate the user has provided.
         uint256 rewardDebt; // Reward debt.
-        address tokenOwnerOf; // token of owner
     }
 
     // creation of the interests token.
@@ -71,16 +78,27 @@ contract CBerus is ERC20 {
     // the users' actual share percentage will calculated by:
     // Formula:     user_productivity / global_productivity
     function stake(uint256 tokenId) external update {
-        uint256 _rate = property.tokenHashRate(tokenId);
-        require(_rate > 0, "rate is zero");
         // current holder
         address owner = mdc.ownerOf(tokenId);
         require(owner == msg.sender, "not owner");
-        TokenInfo storage info = tokenInfo[tokenId];
+
+        uint256 _rate = property.tokenHashRate(tokenId);
+        require(_rate > 0, "rate is zero");
+
+        mdc.transferFrom(msg.sender, address(this), tokenId);
+        _ownedTokens[msg.sender].add(tokenId);
+        tokenOwner.set(tokenId, msg.sender);
+        TokenInfo storage info = tokenInfo[msg.sender];
+        if (info.hashRate > 0) {
+            uint256 pending = earned();
+            _transfer(address(this), msg.sender, pending);
+            mintCumulation = mintCumulation.add(pending);
+        }
         totalHashRate = totalHashRate.add(_rate);
-        info.hashRate = _rate;
-        info.rewardDebt = info.hashRate.mul(rewardPerHashRateStored);
-        info.tokenOwnerOf = owner;
+        info.hashRate = info.hashRate.add(_rate);
+        info.rewardDebt = info.rewardDebt.add(
+            info.hashRate.mul(rewardPerHashRateStored)
+        );
         emit Stake(tokenId, _rate);
     }
 
@@ -88,21 +106,25 @@ contract CBerus is ERC20 {
     // This function will decreases user's productivity by value, and updates the global productivity
     // it will record which block this is happenning and accumulates the area of (productivity * time)
     function unStake(uint256 tokenId) external update {
-        TokenInfo storage info = tokenInfo[tokenId];
-
+        uint256 _rate = property.tokenHashRate(tokenId);
+        require(_rate > 0, "rate is zero");
         // current holder
         address owner = mdc.ownerOf(tokenId);
-        require(owner == msg.sender && info.tokenOwnerOf == owner, "not owner");
-        uint256 reward = earned(tokenId);
+        require(owner == msg.sender, "not owner");
+        uint256 reward = earned();
         _transfer(address(this), owner, reward);
-
-        delete tokenInfo[tokenId];
-
+        _ownedTokens[msg.sender].remove(tokenId);
+        tokenOwner.remove(tokenId);
+        TokenInfo storage info = tokenInfo[msg.sender];
+        totalHashRate = totalHashRate.sub(_rate);
+        info.hashRate = info.hashRate.sub(_rate);
+        info.rewardDebt = info.hashRate.mul(rewardPerHashRateStored);
+        mdc.transferFrom(address(this), msg.sender, tokenId);
         emit UnStake(tokenId, reward);
     }
 
-    function earned(uint256 tokenId) public view returns (uint256) {
-        TokenInfo storage info = tokenInfo[tokenId];
+    function earned() public view returns (uint256) {
+        TokenInfo storage info = tokenInfo[msg.sender];
         uint256 _rewardPerHashRateStored = rewardPerHashRateStored;
         // uint256 lpSupply = totalProductivity;
         if (block.number > lastRewardBlock && totalHashRate != 0) {
@@ -126,17 +148,33 @@ contract CBerus is ERC20 {
     }
 
     // Returns how many productivity a user has and global has.
-    function getTotalHashRate(uint256 tokenId)
-        external
-        view
-        returns (uint256, uint256)
-    {
-        return (tokenInfo[tokenId].hashRate, totalHashRate);
+    function getTotalHashRate() external view returns (uint256, uint256) {
+        return (tokenInfo[msg.sender].hashRate, totalHashRate);
     }
 
     // Returns the current gorss product rate.
     function interestsPerBlock() external view returns (uint256) {
         return rewardPerHashRateStored;
+    }
+
+    function ownerOf(uint256 tokenId) private view returns (address) {
+        return tokenOwner.get(tokenId, "query for nonexistent token");
+    }
+
+    function balanceOfOwner(address owner) public view returns (uint256) {
+        require(
+            owner != address(0),
+            "Staking: balance query for the zero address"
+        );
+        return _ownedTokens[owner].length();
+    }
+
+    function tokenOfOwnerByIndex(address owner, uint256 index)
+        public
+        view
+        returns (uint256)
+    {
+        return _ownedTokens[owner].at(index);
     }
 
     modifier lock() {

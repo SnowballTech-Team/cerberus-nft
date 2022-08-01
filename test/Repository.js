@@ -12,25 +12,27 @@ async function main() {
   const [deployer] = await ethers.getSigners()
 
   console.log('deployer:' + deployer.address)
-  const property = await ethers.getContractAt('MillionDogeClubRepository', '0x6671117d1f14849D5a85Ec9c243797af8F62Dd12', signer)
+  const property = await ethers.getContractAt('MillionDogeClubRepository', '0x39F80061ae7a5d501bf25D9320F6934e7ED6B088', signer)
 
   let owner = await property.owner()
   console.log('owner:' + owner)
 
   // let manageTx = await property.addManage(deployer.address)
-  let prop = [500000, 10, 0]
-  // let setTx = await property.setProperty(1, prop)
+  // let manageTx = await property.addManage(deployer.address)
+  // console.log('manageTx:' + manageTx.hash)
+  // await manageTx.wait()
+
+  // let setTx = await property.setProperty(1)
   // console.log('setTx:' + setTx.hash)
   // await setTx.wait()
 
-  // let dogeTx = await property.updateCdoge(1, 10000)
-  // console.log('dogeTx:' + dogeTx.hash)
+  let dogeTx = await property.updateCdoge(deployer.address, 1, 10000)
+  console.log('dogeTx:' + dogeTx.hash)
+  await dogeTx.wait()
 
-  // await dogeTx.wait()
-
-  // let depositTx = await property.depositBerus(1, 10000)
-  // console.log('depositTx:' + depositTx.hash)
-  // await depositTx.wait()
+  let depositTx = await property.depositBerus(1, 10000)
+  console.log('depositTx:' + depositTx.hash)
+  await depositTx.wait()
 
   let get = await property.getProperty(1)
   console.log(get)

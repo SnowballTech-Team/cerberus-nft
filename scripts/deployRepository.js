@@ -13,14 +13,14 @@ async function main() {
   const lockedAmount = hre.ethers.utils.parseEther('1')
 
   const Repository = await hre.ethers.getContractFactory('MillionDogeClubRepository')
-  let cdoge = '0xbA1403c0a2ad71Aa4e1Ad485420Fe5EA7FaB4689'
-  let berus = '0xcBC5894411f388697FdD60254e3a3c69B694bbb3'
+  let cdoge = '0x81e4605c4058b5017b910355F4A1396dC9A7C97A'
+  let berus = '0x9D559f5ea3Ada1B005F313B0D299817B0C1F37A9'
   let mdc = '0x153d3F1FCE5BfB50752fd3F6D44EA20522952e2a'
   let level = '0x3C93b51c4D82AAB48DF7C45EF4Ff76471f05D6E4'
   const repository = await Repository.deploy(cdoge, berus, mdc, level)
   await repository.deployed()
 
-  // repository deployed to: 0x52c2ABe3039F994574bae93317f5Cb77aC8d736c
+  // repository deployed to: 0x39F80061ae7a5d501bf25D9320F6934e7ED6B088
   console.log('repository deployed to:', repository.address)
 }
 

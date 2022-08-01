@@ -13,15 +13,15 @@ async function main() {
   const lockedAmount = hre.ethers.utils.parseEther('1')
 
   const Cdoge = await hre.ethers.getContractFactory('Cdoge')
-  const doge = await Cdoge.deploy('0xE13175C36da232ab9AEFc33f841eeC9b697BBf2a', '0x9F6C71dE830F70dFc352F13fE34F351D7fA9B648')
+  const doge = await Cdoge.deploy('0x9F6C71dE830F70dFc352F13fE34F351D7fA9B648', '0x9F6C71dE830F70dFc352F13fE34F351D7fA9B648')
   await doge.deployed()
 
   const Berus = await hre.ethers.getContractFactory('Berus')
-  const berus = await Berus.deploy('0xE13175C36da232ab9AEFc33f841eeC9b697BBf2a', '0x9F6C71dE830F70dFc352F13fE34F351D7fA9B648')
+  const berus = await Berus.deploy('0x9F6C71dE830F70dFc352F13fE34F351D7fA9B648', '0x9F6C71dE830F70dFc352F13fE34F351D7fA9B648')
   await berus.deployed()
 
-  // Cdoge deployed to: 0xbA1403c0a2ad71Aa4e1Ad485420Fe5EA7FaB4689
-  // Berus deployed to: 0xcBC5894411f388697FdD60254e3a3c69B694bbb3
+  // Cdoge deployed to: 0x81e4605c4058b5017b910355F4A1396dC9A7C97A
+  // Berus deployed to: 0x9D559f5ea3Ada1B005F313B0D299817B0C1F37A9
   console.log('Cdoge deployed to:', doge.address)
   console.log('Berus deployed to:', berus.address)
 }

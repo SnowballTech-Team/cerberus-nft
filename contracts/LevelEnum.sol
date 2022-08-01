@@ -18,3 +18,8 @@ struct Property {
     uint256 berus;
     Level level;
 }
+
+struct History {
+    address seller;
+    Level level;
+}

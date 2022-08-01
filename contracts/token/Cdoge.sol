@@ -62,6 +62,8 @@ contract Cdoge is ERC20, Ownable {
             if (fee > 0) {
                 super._transfer(from, address(pool), fee);
                 super._transfer(from, to, amount - fee);
+            } else {
+                super.transferFrom(from, to, amount);
             }
         } else {
             super.transferFrom(from, to, amount);
