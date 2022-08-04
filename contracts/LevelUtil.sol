@@ -32,14 +32,14 @@ contract LevelUtil is Manage {
         alienBonus = 90;
         martianBonus = 100;
         collectorBonus = 169;
-        levelSoldier = [1000, 10000];
-        levelGeneral = [2000, 20000];
-        levelChieftain = [10000, 100000];
-        levelKing = [50000, 500000];
-        levelAstronaut = [100000, 1000000];
-        levelAlien = [200000, 2000000];
-        levelMartian = [1000000, 10000000];
-        levelCollector = [1000000, 10000000];
+        levelSoldier = [1e21, 1e22];
+        levelGeneral = [2e21, 2e22];
+        levelChieftain = [1e22, 1e23];
+        levelKing = [5e22, 5e23];
+        levelAstronaut = [1e23, 1e24];
+        levelAlien = [2e23, 2e24];
+        levelMartian = [1e24, 1e25];
+        levelCollector = [1e24, 1e25];
     }
 
     function setSoldierBonus(uint256 _bonus) external onlyManage {

@@ -4,24 +4,15 @@
 // You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
-const { ethers } = require('hardhat')
 const hre = require('hardhat')
 
 async function main() {
-  const Pool = await hre.ethers.getContractFactory('CBerusPool')
+  const Mint = await hre.ethers.getContractFactory('Mint')
+  const mint = await Mint.deploy('0xC40Daa74743Fb03a0654b24b2DE3F72B5508f90e', '0xeE077A41f5064D4169C63cb9B2353b96B4b14266')
+  await mint.deployed()
 
-  // level deployed to:
-  // MDC deployed to:
-  // repository deployed to:
-  let _rate = ethers.utils.parseEther('1')
-  let _pro = '0xC40Daa74743Fb03a0654b24b2DE3F72B5508f90e'
-  let _level = '0x2ce2c18B4bbeD86eBf7DaE5dF8b0D80f24b7b0D7'
-  let _mdc = '0xeE077A41f5064D4169C63cb9B2353b96B4b14266'
-  const pool = await Pool.deploy(_rate, _pro, _level, _mdc)
-  await pool.deployed()
-
-  // Pool deployed to: 0x0765cAfCfD27e7BB027c32363b3F491baBA5c97b
-  console.log('Pool deployed to:', pool.address)
+  // Mint deployed to: 0x81e4605c4058b5017b910355F4A1396dC9A7C97A
+  console.log('Mint deployed to:', mint.address)
 }
 
 // We recommend this pattern to be able to use async/await everywhere

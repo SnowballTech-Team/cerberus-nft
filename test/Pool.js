@@ -12,18 +12,21 @@ async function main() {
   const [deployer] = await ethers.getSigners()
 
   console.log('deployer:' + deployer.address)
-  const pool = await ethers.getContractAt('CBerusMing', '0x6E3EDd7648BE18a1149987C94A2f5e0355E3A46c', signer)
+  const pool = await ethers.getContractAt('CBerusPool', '0x0765cAfCfD27e7BB027c32363b3F491baBA5c97b', signer)
 
-  let stakeTx = await pool.stake(1)
-  console.log('stakeTx:' + stakeTx.hash)
-  await stakeTx.wait()
+  let rate = await pool.cberusPerBlock()
+  console.log('rate: ' + rate)
 
-  let unStakeTx = await pool.unStake(1)
-  console.log('unStakeTx:' + unStakeTx.hash)
-  await unStakeTx.wait()
+  // let stakeTx = await pool.stake(1)
+  // console.log('stakeTx:' + stakeTx.hash)
+  // await stakeTx.wait()
 
-  let amount = await pool.earned(1)
-  console.log('amount:' + amount)
+  // let unStakeTx = await pool.unStake(1)
+  // console.log('unStakeTx:' + unStakeTx.hash)
+  // await unStakeTx.wait()
+
+  // let amount = await pool.earned(1)
+  // console.log('amount:' + amount)
 }
 
 main()

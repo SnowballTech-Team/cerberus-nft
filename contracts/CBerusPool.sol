@@ -9,9 +9,9 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./interface/IERC2917N.sol";
 import "./interface/IRepository.sol";
 import "./interface/ILevel.sol";
+import "./owner/Manage.sol";
 
 /*
     The Objective of ERC2917 Demo is to implement a decentralized staking mechanism, which calculates users' share
@@ -20,7 +20,7 @@ import "./interface/ILevel.sol";
        _____________________________________________________________________________  * (gross_product(t1) - gross_product(t0))
        total_accumulated_productivity(time1) - total_accumulated_productivity(time0)
 */
-contract CBerus is ERC20, ReentrancyGuard, ERC721Holder {
+contract CBerusPool is ERC20, Manage, ReentrancyGuard, ERC721Holder {
     using EnumerableMap for EnumerableMap.UintToAddressMap;
     using EnumerableSet for EnumerableSet.UintSet;
     using SafeMath for uint256;
@@ -31,7 +31,6 @@ contract CBerus is ERC20, ReentrancyGuard, ERC721Holder {
     IERC721 mdc;
 
     uint256 public mintCumulation;
-    uint256 private unlocked = 1;
     uint256 public cberusPerBlock;
     uint256 private lastRewardBlock;
     uint256 public totalHashRate;
@@ -47,7 +46,7 @@ contract CBerus is ERC20, ReentrancyGuard, ERC721Holder {
 
     // creation of the interests token.
     constructor(
-        uint256 _interestsRate,
+        uint256 _rate,
         address _pro,
         address _level,
         address _mdc
@@ -56,14 +55,18 @@ contract CBerus is ERC20, ReentrancyGuard, ERC721Holder {
         level = ILevel(_level);
         mdc = IERC721(_mdc);
 
-        cberusPerBlock = _interestsRate;
+        cberusPerBlock = _rate;
     }
 
     // External function call
     // This function adjust how many token will be produced by each block, eg:
     // changeAmountPerBlock(100)
     // will set the produce rate to 100/block.
-    function changeInterestRatePerBlock(uint256 value) external returns (bool) {
+    function changeInterestRatePerBlock(uint256 value)
+        external
+        onlyManage
+        returns (bool)
+    {
         uint256 old = cberusPerBlock;
         require(value != old, "AMOUNT_PER_BLOCK_NO_CHANGE");
 
@@ -77,7 +80,7 @@ contract CBerus is ERC20, ReentrancyGuard, ERC721Holder {
     // This function increase user's productivity and updates the global productivity.
     // the users' actual share percentage will calculated by:
     // Formula:     user_productivity / global_productivity
-    function stake(uint256 tokenId) external update {
+    function stake(uint256 tokenId) external update nonReentrant {
         // current holder
         address owner = mdc.ownerOf(tokenId);
         require(owner == msg.sender, "not owner");
@@ -105,7 +108,7 @@ contract CBerus is ERC20, ReentrancyGuard, ERC721Holder {
     // External function call
     // This function will decreases user's productivity by value, and updates the global productivity
     // it will record which block this is happenning and accumulates the area of (productivity * time)
-    function unStake(uint256 tokenId) external update {
+    function unStake(uint256 tokenId) external update nonReentrant {
         uint256 _rate = property.tokenHashRate(tokenId);
         require(_rate > 0, "rate is zero");
         // current holder
@@ -140,13 +143,6 @@ contract CBerus is ERC20, ReentrancyGuard, ERC721Holder {
             );
     }
 
-    // External function call
-    // When user calls this function, it will calculate how many token will mint to user from his productivity * time
-    // Also it calculates global token supply from last time the user mint to this time.
-    function mint() external lock returns (uint256) {
-        return 0;
-    }
-
     // Returns how many productivity a user has and global has.
     function getTotalHashRate() external view returns (uint256, uint256) {
         return (tokenInfo[msg.sender].hashRate, totalHashRate);
@@ -175,13 +171,6 @@ contract CBerus is ERC20, ReentrancyGuard, ERC721Holder {
         returns (uint256)
     {
         return _ownedTokens[owner].at(index);
-    }
-
-    modifier lock() {
-        require(unlocked == 1, "Locked");
-        unlocked = 0;
-        _;
-        unlocked = 1;
     }
 
     // Update reward variables of the given pool to be up-to-date.

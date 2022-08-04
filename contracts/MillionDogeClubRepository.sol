@@ -61,7 +61,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     /**
      * set nft property
      */
-    function setProperty(uint256 _tokenId) external onlyManage {
+    function setProperty(uint256 _tokenId) external onlyManage nonReentrant {
         emit SetProperty(msg.sender, _tokenId);
         property[_tokenId] = baseRepos();
     }
@@ -84,7 +84,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         address seller,
         uint256 _tokenId,
         uint256 _amount
-    ) external onlyManage {
+    ) external onlyManage nonReentrant {
         Property storage pro = property[_tokenId];
         pro.cdoge += _amount;
         pro.level = levelInterface.checkLevel(pro.cdoge, pro.berus);
@@ -95,7 +95,10 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     /**
      * deposit berus
      */
-    function depositBerus(uint256 _tokenId, uint256 _amount) external {
+    function depositBerus(uint256 _tokenId, uint256 _amount)
+        external
+        nonReentrant
+    {
         berusToken.transferFrom(msg.sender, address(this), _amount);
         Property storage pro = property[_tokenId];
         pro.berus += _amount;
@@ -106,7 +109,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     /**
      * burn cnft get cdoge
      */
-    function burn(uint256 _tokenId) external {
+    function burn(uint256 _tokenId) external nonReentrant {
         Property memory pro = property[_tokenId];
         cdogeToken.transferFrom(address(this), msg.sender, pro.cdoge);
         berusToken.transferFrom(address(this), msg.sender, pro.berus);

@@ -9,6 +9,8 @@ interface IRepository {
         view
         returns (Property memory);
 
+    function setProperty(uint256 _tokenId) external;
+
     function updateCdoge(
         address seller,
         uint256 _tokenId,
