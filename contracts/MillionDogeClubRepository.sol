@@ -112,7 +112,6 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     function burn(uint256 _tokenId) external nonReentrant {
         Property memory pro = property[_tokenId];
         cdogeToken.transferFrom(address(this), msg.sender, pro.cdoge);
-        berusToken.transferFrom(address(this), msg.sender, pro.berus);
         mdc.burn(_tokenId);
         berusToken.burn(pro.berus);
         delete property[_tokenId];
