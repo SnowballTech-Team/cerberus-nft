@@ -14,11 +14,11 @@ async function main() {
   console.log('deployer:' + deployer.address)
   const property = await ethers.getContractAt('MillionDogeClubRepository', '0xC40Daa74743Fb03a0654b24b2DE3F72B5508f90e', signer)
 
-  let owner = await property.owner()
-  console.log('owner:' + owner)
+  // let owner = await property.owner()
+  // console.log('owner:' + owner)
 
   // let manageTx = await property.addManage(deployer.address)
-  // let manageTx = await property.addManage('0x950F07a443C87fF481F4cd57A58d694175Eaf8D2')
+  // let manageTx = await property.addManage('0x1CB32423BcD55E1c7799B2d4592A7cee114623D3')
   // console.log('manageTx: ' + manageTx.hash)
   // await manageTx.wait()
 
@@ -34,10 +34,20 @@ async function main() {
   // console.log('depositTx:' + depositTx.hash)
   // await depositTx.wait()
 
-  let get = await property.getProperty(18)
-  console.log(get.cdoge)
-  console.log(get.berus)
-  console.log(get.level)
+  // let levelTx = await property.setLevel('0xb5754020ae3B287bD4e633d8135356C9b4d2e027')
+  // console.log('levelTx: ' + levelTx.hash)
+  // await levelTx.wait()
+
+  // let get = await property.getProperty(19)
+  // console.log(get.cdoge)
+  // console.log(get.berus)
+  // console.log(get.level)
+
+  // let record = await property.sellRecoredOfTokenId(19)
+  // console.log(record)
+
+  let hashrate = await property.tokenHashRate(1)
+  console.log(hashrate)
 }
 
 main()

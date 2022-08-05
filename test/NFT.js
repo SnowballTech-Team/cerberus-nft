@@ -14,9 +14,11 @@ async function main() {
   console.log('deployer:' + deployer.address)
   const mdc = await ethers.getContractAt('MillionDogeClub', '0x153d3F1FCE5BfB50752fd3F6D44EA20522952e2a', signer)
 
-  let mintTx = await mdc.mint('0xE13175C36da232ab9AEFc33f841eeC9b697BBf2a')
-  console.log('mintTx:' + mintTx.hash)
-  await mintTx.wait()
+  for (i = 0; i < 10; i++) {
+    let mintTx = await mdc.mint('0xE037420Ebd8B3fa5A68CB0dA7302E9254a45e0f3')
+    console.log('mintTx:' + mintTx.hash)
+    await mintTx.wait()
+  }
 
   // let setBaseURITX = await mdc.setBaseURI('https://nft.btc-z.org/')
   // console.log('setBaseURITX:' + setBaseURITX.hash)

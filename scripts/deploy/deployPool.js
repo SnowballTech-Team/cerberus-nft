@@ -15,12 +15,12 @@ async function main() {
   // repository deployed to:
   let _rate = ethers.utils.parseEther('1')
   let _pro = '0xC40Daa74743Fb03a0654b24b2DE3F72B5508f90e'
-  let _level = '0x2ce2c18B4bbeD86eBf7DaE5dF8b0D80f24b7b0D7'
+  let _level = '0xb5754020ae3B287bD4e633d8135356C9b4d2e027'
   let _mdc = '0xeE077A41f5064D4169C63cb9B2353b96B4b14266'
   const pool = await Pool.deploy(_rate, _pro, _level, _mdc)
   await pool.deployed()
 
-  // Pool deployed to: 0x0765cAfCfD27e7BB027c32363b3F491baBA5c97b
+  // Pool deployed to: 0xF91C5f7c41dfA38Fa4E57292A2429869Dd787B9C
   console.log('Pool deployed to:', pool.address)
 }
 

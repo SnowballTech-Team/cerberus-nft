@@ -16,7 +16,7 @@ async function main() {
   let cdoge = '0x81e4605c4058b5017b910355F4A1396dC9A7C97A'
   let berus = '0x9D559f5ea3Ada1B005F313B0D299817B0C1F37A9'
   let mdc = '0x153d3F1FCE5BfB50752fd3F6D44EA20522952e2a'
-  let level = '0x3C93b51c4D82AAB48DF7C45EF4Ff76471f05D6E4'
+  let level = '0xb5754020ae3B287bD4e633d8135356C9b4d2e027'
   const repository = await Repository.deploy(cdoge, berus, mdc, level)
   await repository.deployed()
 

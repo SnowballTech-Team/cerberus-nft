@@ -133,35 +133,35 @@ contract LevelUtil is Manage {
         returns (Level lv)
     {
         // Soldier 1-1,000 ,1k-10k
-        if (_cdoge < levelSoldier[0] && _berus < levelSoldier[1]) {
+        if (_cdoge <= levelSoldier[0] || _berus <= levelSoldier[1]) {
             return Level.Soldier;
         }
         // General 1,001-2,000 ,10k-20k
-        if (_cdoge < levelGeneral[0] && _berus < levelGeneral[1]) {
+        if (_cdoge <= levelGeneral[0] || _berus <= levelGeneral[1]) {
             return Level.General;
         }
         // Chieftain 2,001-10,000 ,20k-100k
-        if (_cdoge < levelChieftain[0] && _berus < levelChieftain[1]) {
+        if (_cdoge <= levelChieftain[0] || _berus <= levelChieftain[1]) {
             return Level.Chieftain;
         }
         // King 10,001-50,000 ,100k-500k
-        if (_cdoge < levelKing[0] && _berus < levelKing[1]) {
+        if (_cdoge <= levelKing[0] || _berus <= levelKing[1]) {
             return Level.King;
         }
         // Astronaut 50,001-100,000 ,500k-1M
-        if (_cdoge < levelAstronaut[0] && _berus < levelAstronaut[1]) {
+        if (_cdoge <= levelAstronaut[0] || _berus <= levelAstronaut[1]) {
             return Level.Astronaut;
         }
         // Alien 100,001-200,000, 1M-2M
-        if (_cdoge < levelAlien[0] && _berus < levelAlien[1]) {
+        if (_cdoge <= levelAlien[0] || _berus <= levelAlien[1]) {
             return Level.Alien;
         }
         // Martian 200,001-1,000,000 ,2M-10M
-        if (_cdoge < levelMartian[0] && _berus < levelMartian[1]) {
+        if (_cdoge <= levelMartian[0] || _berus <= levelMartian[1]) {
             return Level.Martian;
         }
         //  Collector 1,000,001+ ,10M+
-        if (_cdoge > levelCollector[0] && _berus > levelCollector[1]) {
+        if (_cdoge > levelCollector[0] || _berus > levelCollector[1]) {
             return Level.Collector;
         }
     }

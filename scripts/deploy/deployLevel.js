@@ -16,7 +16,7 @@ async function main() {
   const level = await Level.deploy()
   await level.deployed()
 
-  // level deployed to: 0x3C93b51c4D82AAB48DF7C45EF4Ff76471f05D6E4
+  // level deployed to: 0xb5754020ae3B287bD4e633d8135356C9b4d2e027
   console.log('level deployed to:', level.address)
 }
 
