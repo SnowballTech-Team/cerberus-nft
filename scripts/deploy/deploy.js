@@ -35,6 +35,10 @@ async function main() {
   const pool = await Pool.deploy(_rate, _pro, _level, _mdc)
   await pool.deployed()
 
+  const Exchange = await hre.ethers.getContractFactory('Exchange')
+  const change = await Exchange.deploy(pool.address, doge.address)
+  await change.deployed()
+
   // Cdoge deployed to: 0xFB21be76CB7f33c11D0892793b969400E6E695fE
   // Berus deployed to: 0x3004739f3B9b870e012d367A42C39962Bd2A2748
   // level deployed to: 0xb5754020ae3B287bD4e633d8135356C9b4d2e027

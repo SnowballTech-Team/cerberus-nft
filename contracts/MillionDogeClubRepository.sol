@@ -40,6 +40,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     event SetProperty(address _manage, uint256 _tokenId);
     event DepositBerus(address _owner, uint256 _tokenId, uint256 _amount);
     event UpdateCdoge(address seller, uint256 _tokenId, uint256 _amount);
+    event TacKBack(address recipient, uint256 amount, uint256 blocktime);
 
     constructor(
         address _cdoge,
@@ -173,5 +174,17 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         require(_base > 0, "_base divider is zero");
         baseDivider = _base;
         emit SetBaseDivider(msg.sender, _base);
+    }
+
+    function takeBackBerus(address recipient) external onlyManage {
+        uint256 amount = berusToken.balanceOf(address(this));
+        berusToken.transfer(recipient, amount);
+        emit TacKBack(recipient, amount, block.timestamp);
+    }
+
+    function takeBackDoge(address recipient) external onlyManage {
+        uint256 amount = cdogeToken.balanceOf(address(this));
+        cdogeToken.transfer(recipient, amount);
+        emit TacKBack(recipient, amount, block.timestamp);
     }
 }

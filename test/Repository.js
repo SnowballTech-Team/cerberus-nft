@@ -20,9 +20,9 @@ async function main() {
   // console.log('owner:' + owner)
 
   // let manageTx = await property.addManage(deployer.address)
-  // let manageTx = await property.addManage('0x646445E23AEd83829Cf841f2EAB4a82BCCfd337A')
-  // console.log('manageTx: ' + manageTx.hash)
-  // await manageTx.wait()
+  let manageTx = await property.addManage('0x684e313bc8b9b6E181A38f02fa13af0Ce756936d')
+  console.log('manageTx: ' + manageTx.hash)
+  await manageTx.wait()
 
   // let setTx = await property.setProperty(1)
   // console.log('setTx:' + setTx.hash)
@@ -32,19 +32,19 @@ async function main() {
   // console.log('dogeTx:' + dogeTx.hash)
   // await dogeTx.wait()
 
-  let approveTokenTx = await token.approve('0x118A5305ABe475089cAc273a7A80cC2bb0Abf3c4', ethers.utils.parseEther('10000'))
-  console.log('approveTokenTx: ' + approveTokenTx.hash)
-  await approveTokenTx.wait()
+  // let approveTokenTx = await token.approve('0x118A5305ABe475089cAc273a7A80cC2bb0Abf3c4', ethers.utils.parseEther('10000'))
+  // console.log('approveTokenTx: ' + approveTokenTx.hash)
+  // await approveTokenTx.wait()
 
-  let depositTx = await property.depositBerus(4, ethers.utils.parseEther('10000'))
-  console.log('depositTx: ' + depositTx.hash)
-  await depositTx.wait()
+  // let depositTx = await property.depositBerus(4, ethers.utils.parseEther('10000'))
+  // console.log('depositTx: ' + depositTx.hash)
+  // await depositTx.wait()
 
   // let levelTx = await property.setLevel('0xb5754020ae3B287bD4e633d8135356C9b4d2e027')
   // console.log('levelTx: ' + levelTx.hash)
   // await levelTx.wait()
 
-  let get = await property.getProperty(4)
+  let get = await property.getProperty(1)
   console.log(get.cdoge)
   console.log(get.berus)
   console.log(get.level)
@@ -55,13 +55,13 @@ async function main() {
   // let hashrate = await property.tokenHashRate(3)
   // console.log(hashrate)
 
-  let approveTx = await mdc.approve('0x118A5305ABe475089cAc273a7A80cC2bb0Abf3c4', 4)
-  console.log('approveTx: ' + approveTx.hash)
-  await approveTx.wait()
+  // let approveTx = await mdc.approve('0x118A5305ABe475089cAc273a7A80cC2bb0Abf3c4', 4)
+  // console.log('approveTx: ' + approveTx.hash)
+  // await approveTx.wait()
 
-  let burnTx = await property.burn(4)
-  console.log('burnTx: ' + burnTx.hash)
-  await burnTx.wait()
+  // let burnTx = await property.burn(4)
+  // console.log('burnTx: ' + burnTx.hash)
+  // await burnTx.wait()
 }
 
 main()

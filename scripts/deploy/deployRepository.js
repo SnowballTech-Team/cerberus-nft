@@ -20,7 +20,7 @@ async function main() {
   const repository = await Repository.deploy(cdoge, berus, mdc, level)
   await repository.deployed()
 
-  // repository deployed to: 0x44425dba120722332153f034cFF57f320fF0Bfbc
+  // repository deployed to: 0x8f87Ef7FBb1e3Eb30F1D3c845Da579df66C3EB3e
   console.log('repository deployed to:', repository.address)
 }
 
