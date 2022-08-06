@@ -20,7 +20,7 @@ async function main() {
   const pool = await Pool.deploy(_rate, _pro, _level, _mdc)
   await pool.deployed()
 
-  // Pool deployed to: 0xF91C5f7c41dfA38Fa4E57292A2429869Dd787B9C
+  // Pool deployed to: 0x36Bd4abA0454d00B76258C6741B8d4e94e8af18E
   console.log('Pool deployed to:', pool.address)
 }
 

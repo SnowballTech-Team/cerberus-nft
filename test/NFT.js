@@ -12,11 +12,11 @@ async function main() {
   const [deployer] = await ethers.getSigners()
 
   console.log('deployer:' + deployer.address)
-  const mdc = await ethers.getContractAt('MillionDogeClub', '0x153d3F1FCE5BfB50752fd3F6D44EA20522952e2a', signer)
+  const mdc = await ethers.getContractAt('MillionDogeClub', '0xeE077A41f5064D4169C63cb9B2353b96B4b14266', signer)
 
   for (i = 0; i < 10; i++) {
     let mintTx = await mdc.mint('0xE037420Ebd8B3fa5A68CB0dA7302E9254a45e0f3')
-    console.log('mintTx:' + mintTx.hash)
+    console.log('mintTx: ' + mintTx.hash)
     await mintTx.wait()
   }
 

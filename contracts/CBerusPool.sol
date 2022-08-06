@@ -111,7 +111,7 @@ contract CBerusPool is ERC20, Manage, ReentrancyGuard, ERC721Holder {
         uint256 _rate = property.tokenHashRate(tokenId);
         require(_rate > 0, "rate is zero");
         // current holder
-        address owner = mdc.ownerOf(tokenId);
+        address owner = ownerOf(tokenId);
         require(owner == msg.sender, "not owner");
         uint256 reward = earned();
         _transfer(address(this), owner, reward);
@@ -133,11 +133,11 @@ contract CBerusPool is ERC20, Manage, ReentrancyGuard, ERC721Holder {
             uint256 multiplier = block.number.sub(lastRewardBlock);
             uint256 reward = multiplier.mul(cberusPerBlock);
             _rewardPerHashRateStored = _rewardPerHashRateStored.add(
-                reward.mul(1e12).div(totalHashRate)
+                reward.mul(1e18).div(totalHashRate)
             );
         }
         return
-            info.hashRate.mul(_rewardPerHashRateStored).div(1e12).sub(
+            info.hashRate.mul(_rewardPerHashRateStored).div(1e18).sub(
                 info.rewardDebt
             );
     }
@@ -152,11 +152,11 @@ contract CBerusPool is ERC20, Manage, ReentrancyGuard, ERC721Holder {
         return rewardPerHashRateStored;
     }
 
-    function ownerOf(uint256 tokenId) private view returns (address) {
+    function ownerOf(uint256 tokenId) public view returns (address) {
         return tokenOwner.get(tokenId, "query for nonexistent token");
     }
 
-    function balanceOfOwner(address owner) public view returns (uint256) {
+    function balanceOfOwner(address owner) external view returns (uint256) {
         require(
             owner != address(0),
             "Staking: balance query for the zero address"
@@ -165,7 +165,7 @@ contract CBerusPool is ERC20, Manage, ReentrancyGuard, ERC721Holder {
     }
 
     function tokenOfOwnerByIndex(address owner, uint256 index)
-        public
+        external
         view
         returns (uint256)
     {
@@ -178,16 +178,15 @@ contract CBerusPool is ERC20, Manage, ReentrancyGuard, ERC721Holder {
             return;
         }
 
-        if (totalHashRate == 0) {
-            lastRewardBlock = block.number;
-            return;
+        if (totalHashRate != 0) {
+            uint256 multiplier = block.number.sub(lastRewardBlock);
+            uint256 reward = multiplier.mul(cberusPerBlock);
+            super._mint(address(this), reward);
+            rewardPerHashRateStored = rewardPerHashRateStored.add(
+                reward.mul(1e18).div(totalHashRate)
+            );
         }
-        uint256 multiplier = block.number.sub(lastRewardBlock);
-        uint256 reward = multiplier.mul(cberusPerBlock);
-        super._mint(address(this), reward);
-        rewardPerHashRateStored = rewardPerHashRateStored.add(
-            reward.div(totalHashRate)
-        );
+
         lastRewardBlock = block.number;
         _;
     }
