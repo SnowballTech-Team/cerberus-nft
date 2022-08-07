@@ -18,6 +18,10 @@ async function main() {
   let rate = await pool.cberusPerBlock()
   console.log('rate: ' + rate)
 
+  let manageTx = await pool.addManage(deployer.address)
+  console.log('manageTx: ' + manageTx.hash)
+  await manageTx.wait()
+
   // approve
   // let approveTx = await mdc.approve('0x866FaFC86e63A09D99bFdB243491F80622424758', 3)
   // console.log('approveTx:' + approveTx.hash)
@@ -27,23 +31,27 @@ async function main() {
   // console.log('stakeTx: ' + stakeTx.hash)
   // await stakeTx.wait()
 
-  let balance = await pool.balanceOfOwner(deployer.address)
-  console.log('balance: ' + balance)
+  // let balance = await pool.balanceOfOwner(deployer.address)
+  // console.log('balance: ' + balance)
 
-  let totalHashRate = await pool.getTotalHashRate()
-  console.log('totalHashRate: ' + totalHashRate)
-  let reward = await pool.earned()
-  console.log('reward: ' + reward)
+  // let totalHashRate = await pool.getTotalHashRate()
+  // console.log('totalHashRate: ' + totalHashRate)
+  // let reward = await pool.earned()
+  // console.log('reward: ' + reward)
 
-  let unStakeTx = await pool.unStake(3)
-  console.log('unStakeTx: ' + unStakeTx.hash)
-  await unStakeTx.wait()
+  // let unStakeTx = await pool.unStake(3)
+  // console.log('unStakeTx: ' + unStakeTx.hash)
+  // await unStakeTx.wait()
 
-  let info = await pool.stakeInfo('0x9F6C71dE830F70dFc352F13fE34F351D7fA9B648')
-  console.log('info:' + info)
+  // let info = await pool.stakeInfo('0x9F6C71dE830F70dFc352F13fE34F351D7fA9B648')
+  // console.log('info:' + info)
 
-  let stored = await pool.rewardPerHashRateStored()
-  console.log('stored:' + stored)
+  // let stored = await pool.rewardPerHashRateStored()
+  // console.log('stored:' + stored)
+
+  let repositoryTx = await pool.setProperty('0xb1ab017E80Bb0711DA6E92EabcB6e16330c8e123')
+  console.log('repositoryTx:' + repositoryTx.hash)
+  await repositoryTx.wait()
 }
 
 main()

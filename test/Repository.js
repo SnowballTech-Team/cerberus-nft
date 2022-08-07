@@ -11,8 +11,8 @@ async function main() {
 
   const [deployer] = await ethers.getSigners()
 
-  console.log('deployer:' + deployer.address)
-  const property = await ethers.getContractAt('MillionDogeClubRepository', '0x118A5305ABe475089cAc273a7A80cC2bb0Abf3c4', signer)
+  console.log('deployer: ' + deployer.address)
+  const property = await ethers.getContractAt('MillionDogeClubRepository', '0x8f87Ef7FBb1e3Eb30F1D3c845Da579df66C3EB3e', signer)
   const token = await ethers.getContractAt('Berus', '0x3004739f3B9b870e012d367A42C39962Bd2A2748', signer)
   const mdc = await ethers.getContractAt('MillionDogeClub', '0xeE077A41f5064D4169C63cb9B2353b96B4b14266', signer)
 

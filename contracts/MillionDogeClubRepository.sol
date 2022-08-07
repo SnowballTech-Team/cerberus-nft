@@ -87,9 +87,9 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         uint256 _amount
     ) external onlyManage nonReentrant {
         Property storage pro = property[_tokenId];
+        sellRecored[_tokenId].push(History(seller, pro.level));
         pro.cdoge += _amount;
         pro.level = levelInterface.checkLevel(pro.cdoge, pro.berus);
-        sellRecored[_tokenId].push(History(seller, pro.level));
         emit UpdateCdoge(seller, _tokenId, _amount);
     }
 
