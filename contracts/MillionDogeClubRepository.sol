@@ -39,7 +39,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     event SetBaseBerus(address manage, uint256 _base);
     event SetProperty(address _manage, uint256 _tokenId);
     event DepositBerus(address _owner, uint256 _tokenId, uint256 _amount);
-    event UpdateCdoge(address seller, uint256 _tokenId, uint256 _amount);
+    event UpdateCdoge(uint256 _tokenId, uint256 _amount);
     event TacKBack(address recipient, uint256 amount, uint256 blocktime);
 
     constructor(
@@ -81,16 +81,15 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     /**
      * update cdoge
      */
-    function updateCdoge(
-        address seller,
-        uint256 _tokenId,
-        uint256 _amount
-    ) external onlyManage nonReentrant {
+    function updateCdoge(uint256 _tokenId, uint256 _amount)
+        external
+        onlyManage
+        nonReentrant
+    {
         Property storage pro = property[_tokenId];
-        sellRecored[_tokenId].push(History(seller, pro.level));
         pro.cdoge += _amount;
         pro.level = levelInterface.checkLevel(pro.cdoge, pro.berus);
-        emit UpdateCdoge(seller, _tokenId, _amount);
+        emit UpdateCdoge(_tokenId, _amount);
     }
 
     /**
@@ -124,14 +123,6 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
         uint256 lv = levelInterface.checkBonus(pro.level);
         // calc current rate
         return pro.cdoge.mul(lv).div(baseDivider).add(pro.cdoge);
-    }
-
-    function sellRecoredOfTokenId(uint256 tokenId)
-        external
-        view
-        returns (History[] memory)
-    {
-        return sellRecored[tokenId];
     }
 
     function setBaseDoge(uint256 _base) external onlyManage {
