@@ -7,9 +7,10 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "./owner/Manage.sol";
 
 contract MillionDogeClub is
-    Ownable,
+    Manage,
     ERC721Enumerable,
     ReentrancyGuard,
     Pausable
@@ -33,7 +34,7 @@ contract MillionDogeClub is
         emit SetBaseURI(baseURI_, msg.sender);
     }
 
-    function mint(address player) external returns (uint256) {
+    function mint(address player) external onlyManage returns (uint256) {
         _tokenIds.increment();
         uint256 id = _tokenIds.current();
         _mint(player, id);

@@ -11,7 +11,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interface/IRepository.sol";
 import "./interface/ILevel.sol";
-import "./interface/IReferral.sol";
 import "./owner/Manage.sol";
 
 contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
@@ -20,7 +19,6 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
     using SafeMath for uint256;
     EnumerableMap.UintToAddressMap private tokenOwner;
 
-    IReferral referral;
     ILevel public level;
     IRepository property;
     IERC20 berus;
@@ -32,8 +30,14 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
     uint256 public rewardPerHashRateStored;
 
     mapping(address => bool) public deposit;
-    mapping(address => uint256) public hashRateOf;
+    mapping(address => bool) public _hashRate;
+    mapping(address => StakeInfo) public stakeInfo;
     mapping(address => EnumerableSet.UintSet) private _ownedTokens;
+
+    struct StakeInfo {
+        uint256 hashRate; // How many hashRate the user has provided.
+        uint256 rewardDebt; // Reward debt.
+    }
 
     // creation of the interests token.
     constructor(
@@ -41,15 +45,13 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
         address _pro,
         address _level,
         address _berus,
-        address _mdc,
-        address _referral
+        address _mdc
     ) {
-        cberusPerBlock = _rate;
         property = IRepository(_pro);
         level = ILevel(_level);
         mdc = IERC721(_mdc);
         berus = IERC20(_berus);
-        referral = IReferral(_referral);
+        cberusPerBlock = _rate;
     }
 
     // External function call
@@ -86,13 +88,14 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
         mdc.transferFrom(msg.sender, address(this), tokenId);
         _ownedTokens[msg.sender].add(tokenId);
         tokenOwner.set(tokenId, msg.sender);
-        hashRateOf[msg.sender] = _rate;
+        StakeInfo storage info = stakeInfo[msg.sender];
         totalHashRate = totalHashRate.add(_rate);
+        info.hashRate = info.hashRate.add(_rate);
+        info.rewardDebt = info.rewardDebt.add(
+            info.hashRate.mul(rewardPerHashRateStored)
+        );
+
         deposit[msg.sender] = true;
-
-        Property memory pro = property.getProperty(tokenId);
-        referral.updateStake(msg.sender, pro.level, true);
-
         emit Stake(tokenId, _rate);
     }
 
@@ -109,16 +112,17 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
         berus.transferFrom(address(this), owner, reward);
         _ownedTokens[msg.sender].remove(tokenId);
         tokenOwner.remove(tokenId);
+        StakeInfo storage info = stakeInfo[msg.sender];
         totalHashRate = totalHashRate.sub(_rate);
-        hashRateOf[msg.sender] = 0;
+        info.hashRate = info.hashRate.sub(_rate);
+        info.rewardDebt = info.hashRate.mul(rewardPerHashRateStored);
         mdc.transferFrom(address(this), msg.sender, tokenId);
         deposit[msg.sender] = false;
-        Property memory pro = property.getProperty(tokenId);
-        referral.updateStake(msg.sender, pro.level, false);
         emit UnStake(tokenId, reward);
     }
 
     function earned() public view returns (uint256) {
+        StakeInfo storage info = stakeInfo[msg.sender];
         uint256 _rewardPerHashRateStored = rewardPerHashRateStored;
         // uint256 lpSupply = totalProductivity;
         if (block.number > lastRewardBlock && totalHashRate != 0) {
@@ -128,12 +132,15 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
                 reward.mul(1e18).div(totalHashRate)
             );
         }
-        return hashRateOf[msg.sender].mul(_rewardPerHashRateStored).div(1e18);
+        return
+            info.hashRate.mul(_rewardPerHashRateStored).div(1e18).sub(
+                info.rewardDebt
+            );
     }
 
     // Returns how many productivity a user has and global has.
     function getTotalHashRate() external view returns (uint256, uint256) {
-        return (hashRateOf[msg.sender], totalHashRate);
+        return (stakeInfo[msg.sender].hashRate, totalHashRate);
     }
 
     // Returns the current gorss product rate.
@@ -198,22 +205,15 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
     }
 
     function setProperty(address _property) external onlyManage {
-        require(_property != address(0), "property address is zero");
+        require(_property != address(0), "level address is zero");
         property = IRepository(_property);
         emit SetProperty(msg.sender, _property);
-    }
-
-    function setReferral(address _referral) external onlyManage {
-        require(_referral != address(0), "referral address is zero");
-        referral = IReferral(_referral);
-        emit SetReferral(msg.sender, _referral);
     }
 
     event SetMdc(address manage, address _mdc);
     event SetBerus(address manage, address _berus);
     event SetLevel(address manage, address _level);
     event SetProperty(address manage, address _property);
-    event SetReferral(address manage, address _referral);
     /// @dev This emit when interests amount per block is changed by the owner of the contract.
     /// It emits with the old interests amount and the new interests amount.
     event InterestRatePerBlockChanged(uint256 oldValue, uint256 newValue);
