@@ -13,7 +13,7 @@ import "./interface/IRepository.sol";
 import "./interface/ILevel.sol";
 import "./owner/Manage.sol";
 
-contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
+contract CBerusPoolCopy is Manage, ReentrancyGuard, ERC721Holder {
     using EnumerableMap for EnumerableMap.UintToAddressMap;
     using EnumerableSet for EnumerableSet.UintSet;
     using SafeMath for uint256;

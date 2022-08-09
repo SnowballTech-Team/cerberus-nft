@@ -12,7 +12,7 @@ async function main() {
   const [deployer] = await ethers.getSigners()
 
   console.log('deployer: ' + deployer.address)
-  const property = await ethers.getContractAt('MillionDogeClubRepository', '0x8f87Ef7FBb1e3Eb30F1D3c845Da579df66C3EB3e', signer)
+  const property = await ethers.getContractAt('MillionDogeClubRepository', '0x6671117d1f14849D5a85Ec9c243797af8F62Dd12', signer)
   const token = await ethers.getContractAt('Berus', '0x3004739f3B9b870e012d367A42C39962Bd2A2748', signer)
   const mdc = await ethers.getContractAt('MillionDogeClub', '0xeE077A41f5064D4169C63cb9B2353b96B4b14266', signer)
 
@@ -20,7 +20,7 @@ async function main() {
   // console.log('owner:' + owner)
 
   // let manageTx = await property.addManage(deployer.address)
-  let manageTx = await property.addManage('0x684e313bc8b9b6E181A38f02fa13af0Ce756936d')
+  let manageTx = await property.addManage('0x712B8F3963AD1512f6f711F7c6A8B2F8AE6b713b')
   console.log('manageTx: ' + manageTx.hash)
   await manageTx.wait()
 

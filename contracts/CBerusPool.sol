@@ -78,7 +78,7 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
         // current holder
         address owner = mdc.ownerOf(tokenId);
         require(owner == msg.sender, "not owner");
-        require(deposit[msg.sender], "has been deposited");
+        require(!deposit[msg.sender], "has been deposited");
 
         uint256 _rate = property.tokenHashRate(tokenId);
         require(_rate > 0, "rate is zero");

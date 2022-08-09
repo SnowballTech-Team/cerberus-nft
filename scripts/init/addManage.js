@@ -18,7 +18,7 @@ async function main() {
   const [deployer] = await ethers.getSigners()
   console.log('deployer:' + deployer.address)
 
-  const repository = await ethers.getContractAt('MillionDogeClubRepository', '0xC40Daa74743Fb03a0654b24b2DE3F72B5508f90e', signer)
+  const repository = await ethers.getContractAt('MillionDogeClubRepository', '0x505a7D5E6c70f2e898458226457D46177C03acf5', signer)
 
   // process.env.FACTORY
   let manageMinerTx = await repository.addManage('0x4ddEf3c413370A4D6CB35595503604CFacD823D0')

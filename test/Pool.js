@@ -12,7 +12,7 @@ async function main() {
   const [deployer] = await ethers.getSigners()
 
   console.log('deployer:' + deployer.address)
-  const pool = await ethers.getContractAt('CBerusPool', '0x866FaFC86e63A09D99bFdB243491F80622424758', signer)
+  const pool = await ethers.getContractAt('CBerusPool', '0xE7530DccCb987762E725e05a92E143C9e05317d9', signer)
   const mdc = await ethers.getContractAt('MillionDogeClub', '0xeE077A41f5064D4169C63cb9B2353b96B4b14266', signer)
 
   let rate = await pool.cberusPerBlock()
