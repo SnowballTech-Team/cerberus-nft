@@ -13,7 +13,7 @@ async function main() {
 
   console.log('deployer:' + deployer.address)
   // const pool = await ethers.getContractAt('CBerusPool', '0x811b0e5f8e41A6C3A2ff5426782a85D5FfA40A08', signer)
-  const pool = await ethers.getContractAt('CBerusPool', '0x6f07094bF88EC0c1Fe1eAFb3795540809Da6CD6e', signer)
+  const pool = await ethers.getContractAt('CBerusPool', '0x5EcCBfC2643008cb8Ec162cBe35cEF2e1D69806B', signer)
   const mdc = await ethers.getContractAt('MillionDogeClub', '0x6E3EDd7648BE18a1149987C94A2f5e0355E3A46c', signer)
 
   let rate = await pool.cberusPerBlock()
@@ -24,7 +24,7 @@ async function main() {
   // await manageTx.wait()
 
   // approve
-  // let approveTx = await mdc.approve('0x811b0e5f8e41A6C3A2ff5426782a85D5FfA40A08', 6)
+  // let approveTx = await mdc.approve('0x5EcCBfC2643008cb8Ec162cBe35cEF2e1D69806B', 6)
   // console.log('approveTx:' + approveTx.hash)
   // await approveTx.wait()
 
@@ -32,22 +32,22 @@ async function main() {
   // console.log('stakeTx: ' + stakeTx.hash)
   // await stakeTx.wait()
 
-  // let balance = await pool.balanceOfOwner(deployer.address)
-  // console.log('balance: ' + balance)
+  let balance = await pool.balanceOfOwner(deployer.address)
+  console.log('balance: ' + balance)
 
-  // let totalHashRate = await pool.getTotalHashRate()
-  // console.log('totalHashRate: ' + totalHashRate)
+  let totalHashRate = await pool.getTotalHashRate()
+  console.log('totalHashRate: ' + totalHashRate)
 
-  // let reward = await pool.earned()
-  // console.log('reward: ' + reward)
+  let reward = await pool.earned()
+  console.log('reward: ' + reward)
 
-  // let unStakeTx = await pool.unStake(6)
-  // console.log('unStakeTx: ' + unStakeTx.hash)
-  // await unStakeTx.wait()
+  let unStakeTx = await pool.unStake(6)
+  console.log('unStakeTx: ' + unStakeTx.hash)
+  await unStakeTx.wait()
 
-  let testTx = await pool.test()
-  console.log('testTx: ' + testTx.hash)
-  await testTx.wait()
+  // let testTx = await pool.test()
+  // console.log('testTx: ' + testTx.hash)
+  // await testTx.wait()
 
   // let info = await pool.stakeInfo('0x9F6C71dE830F70dFc352F13fE34F351D7fA9B648')
   // console.log('info:' + info)
