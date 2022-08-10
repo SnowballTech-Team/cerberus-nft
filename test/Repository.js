@@ -20,15 +20,15 @@ async function main() {
   // console.log('owner:' + owner)
 
   // let manageTx = await property.addManage(deployer.address)
-  let manageTx = await property.addManage('0x712B8F3963AD1512f6f711F7c6A8B2F8AE6b713b')
-  console.log('manageTx: ' + manageTx.hash)
-  await manageTx.wait()
+  // let manageTx = await property.addManage('0x094c614d638580BBe2Af1dE46826F5Ba16D2BfF3')
+  // console.log('manageTx: ' + manageTx.hash)
+  // await manageTx.wait()
 
   // let setTx = await property.setProperty(1)
   // console.log('setTx:' + setTx.hash)
   // await setTx.wait()
 
-  // let dogeTx = await property.updateCdoge(deployer.address, 3, ethers.utils.parseEther('999'))
+  // let dogeTx = await property.updateCdoge(6, ethers.utils.parseEther('999'))
   // console.log('dogeTx:' + dogeTx.hash)
   // await dogeTx.wait()
 
@@ -44,7 +44,7 @@ async function main() {
   // console.log('levelTx: ' + levelTx.hash)
   // await levelTx.wait()
 
-  let get = await property.getProperty(1)
+  let get = await property.getProperty(3)
   console.log(get.cdoge)
   console.log(get.berus)
   console.log(get.level)
@@ -52,8 +52,8 @@ async function main() {
   // let record = await property.sellRecoredOfTokenId(19)
   // console.log(record)
 
-  // let hashrate = await property.tokenHashRate(3)
-  // console.log(hashrate)
+  let hashrate = await property.tokenHashRate(3)
+  console.log(hashrate)
 
   // let approveTx = await mdc.approve('0x118A5305ABe475089cAc273a7A80cC2bb0Abf3c4', 4)
   // console.log('approveTx: ' + approveTx.hash)

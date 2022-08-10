@@ -14,15 +14,15 @@ async function main() {
   console.log('deployer:' + deployer.address)
   const mdc = await ethers.getContractAt('MillionDogeClub', '0x6E3EDd7648BE18a1149987C94A2f5e0355E3A46c', signer)
 
-  // for (i = 0; i < 10; i++) {
-  //   let mintTx = await mdc.mint('0xE037420Ebd8B3fa5A68CB0dA7302E9254a45e0f3')
+  let manageTx = await mdc.addManage(deployer.address)
+  console.log('manageTx: ' + manageTx.hash)
+  await manageTx.wait()
+
+  // for (i = 0; i < 5; i++) {
+  //   let mintTx = await mdc.mint(deployer.address)
   //   console.log('mintTx: ' + mintTx.hash)
   //   await mintTx.wait()
   // }
-
-  let manageTx = await mdc.addManage('0x178fe3900B3ef39eBE0E62E1f1dB2f6b24Fdc2Cb')
-  console.log('manageTx: ' + manageTx.hash)
-  await manageTx.wait()
 
   // let setBaseURITX = await mdc.setBaseURI('https://nft.btc-z.org/')
   // console.log('setBaseURITX:' + setBaseURITX.hash)
@@ -30,6 +30,9 @@ async function main() {
 
   // let baseURI = await mdc.baseURI()
   // console.log('baseURI:' + baseURI)
+
+  // let tokenId = await mdc.tokenOfOwnerByIndex(deployer.address, 0)
+  // console.log('tokenId:' + tokenId)
 
   // approve
   // let approveTx = await mdc.approve('0xA21C66a62f340737Aa1F3B9614522B71697a5b4e', 1)

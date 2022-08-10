@@ -45,6 +45,8 @@ contract Cdoge is ERC20, Ownable {
             if (fee > 0) {
                 super._transfer(_msgSender(), address(pool), fee);
                 super._transfer(_msgSender(), recipient, amount - fee);
+            } else {
+                super._transfer(_msgSender(), recipient, amount);
             }
         } else {
             super._transfer(_msgSender(), recipient, amount);
@@ -60,8 +62,8 @@ contract Cdoge is ERC20, Ownable {
         if (to == pair) {
             uint256 fee = calculateFee(from, to, amount);
             if (fee > 0) {
-                super._transfer(from, address(pool), fee);
-                super._transfer(from, to, amount - fee);
+                super.transferFrom(from, address(pool), fee);
+                super.transferFrom(from, to, amount - fee);
             } else {
                 super.transferFrom(from, to, amount);
             }

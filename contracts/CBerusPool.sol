@@ -20,11 +20,11 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
     using SafeMath for uint256;
     EnumerableMap.UintToAddressMap private tokenOwner;
 
-    IReferral referral;
+    IReferral public referral;
     ILevel public level;
-    IRepository property;
-    IERC20 berus;
-    IERC721 mdc;
+    IRepository public property;
+    IERC20 public berus;
+    IERC721 public mdc;
 
     uint256 public cberusPerBlock;
     uint256 private lastRewardBlock;
@@ -81,7 +81,6 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
         require(!deposit[msg.sender], "has been deposited");
 
         uint256 _rate = property.tokenHashRate(tokenId);
-        require(_rate > 0, "rate is zero");
 
         mdc.transferFrom(msg.sender, address(this), tokenId);
         _ownedTokens[msg.sender].add(tokenId);
@@ -101,12 +100,12 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
     // it will record which block this is happenning and accumulates the area of (productivity * time)
     function unStake(uint256 tokenId) external update nonReentrant {
         uint256 _rate = property.tokenHashRate(tokenId);
-        require(_rate > 0, "rate is zero");
+
         // current holder
         address owner = ownerOf(tokenId);
         require(owner == msg.sender, "not owner");
         uint256 reward = earned();
-        berus.transferFrom(address(this), owner, reward);
+        berus.transfer(owner, reward);
         _ownedTokens[msg.sender].remove(tokenId);
         tokenOwner.remove(tokenId);
         totalHashRate = totalHashRate.sub(_rate);
@@ -116,6 +115,14 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
         Property memory pro = property.getProperty(tokenId);
         referral.updateStake(msg.sender, pro.level, false);
         emit UnStake(tokenId, reward);
+    }
+
+    function test() external {
+        berus.transfer(msg.sender, 1e18);
+    }
+
+    function test1() external {
+        berus.transferFrom(address(this), msg.sender, 1e18);
     }
 
     function earned() public view returns (uint256) {
