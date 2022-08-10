@@ -117,14 +117,6 @@ contract CBerusPool is Manage, ReentrancyGuard, ERC721Holder {
         emit UnStake(tokenId, reward);
     }
 
-    function test() external {
-        berus.transfer(msg.sender, 1e18);
-    }
-
-    function test1() external {
-        berus.transferFrom(address(this), msg.sender, 1e18);
-    }
-
     function earned() public view returns (uint256) {
         uint256 _rewardPerHashRateStored = rewardPerHashRateStored;
         // uint256 lpSupply = totalProductivity;
