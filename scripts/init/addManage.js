@@ -5,6 +5,7 @@
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
 const hre = require('hardhat')
+require('dotenv').config({ path: '.env' })
 
 async function main() {
   await run('compile')
@@ -18,12 +19,17 @@ async function main() {
   const [deployer] = await ethers.getSigners()
   console.log('deployer:' + deployer.address)
 
-  const repository = await ethers.getContractAt('MillionDogeClubRepository', '0x505a7D5E6c70f2e898458226457D46177C03acf5', signer)
+  const mdc = await ethers.getContractAt('MillionDogeClub', process.env.MDC, signer)
+  const repository = await ethers.getContractAt('MillionDogeClubRepository', process.env.REPO, signer)
 
   // process.env.FACTORY
-  let manageMinerTx = await repository.addManage('0x4ddEf3c413370A4D6CB35595503604CFacD823D0')
-  console.log('manageMinerTx:' + manageMinerTx.hash)
-  await manageMinerTx.wait()
+  let manageRepoTx = await repository.addManage(process.env.MARKET)
+  console.log('manageRepoTx:' + manageRepoTx.hash)
+  await manageRepoTx.wait()
+
+  let manageMdcTx = await mdc.addManage(process.env.REF)
+  console.log('manageMdcTx:' + manageMdcTx.hash)
+  await manageMdcTx.wait()
 }
 
 // We recommend this pattern to be able to use async/await everywhere
