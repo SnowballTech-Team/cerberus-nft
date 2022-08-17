@@ -38,6 +38,7 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     event SetBaseDoge(address manage, uint256 _base);
     event SetBaseBerus(address manage, uint256 _base);
     event SetProperty(address _manage, uint256 _tokenId);
+    event UpdateProperty(address _manage, uint256 _tokenId);
     event DepositBerus(address _owner, uint256 _tokenId, uint256 _amount);
     event UpdateCdoge(uint256 _tokenId, uint256 _amount);
     event TacKBack(address recipient, uint256 amount, uint256 blocktime);
@@ -65,6 +66,18 @@ contract MillionDogeClubRepository is Manage, ReentrancyGuard {
     function setProperty(uint256 _tokenId) external onlyManage nonReentrant {
         emit SetProperty(msg.sender, _tokenId);
         property[_tokenId] = baseRepos();
+    }
+
+    /**
+     * update nft property
+     */
+    function updateProperty(uint256 _tokenId, Property calldata _pro)
+        external
+        onlyManage
+        nonReentrant
+    {
+        emit UpdateProperty(msg.sender, _tokenId);
+        property[_tokenId] = _pro;
     }
 
     /**
